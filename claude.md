@@ -86,8 +86,8 @@ Once JSON is parsed, the application:
 
 ## Dependencies
 
-- **openai** (v0.26.5) - OpenAI API client library
-- **phue** (v1.1) - Python library for controlling Philips Hue lights
+- **openai** (v2.8.0) - Modern OpenAI API client library with improved async support and type hints
+- **phue2** (v0.0.3) - Modernized fork of phue with type annotations and improved error handling
 - **discoverhue** (v1.0.2) - Library for discovering Hue bridges on the network
 
 ## Setup & Running
@@ -113,12 +113,51 @@ On first execution, you must press the button on your Hue bridge to authorize th
 
 Then enter commands at the prompt: "What should I do with the lights?"
 
+## Recent Refactoring (API Updates)
+
+### OpenAI API Upgrade (0.26.5 → 2.8.0)
+
+The codebase was updated from the legacy OpenAI API to the modern 2.8.0 version:
+
+**Changes Made:**
+- Replaced `openai.ChatCompletion.create()` with `client.chat.completions.create()`
+- Changed from module-level API key setting to client-based initialization
+- Implemented lazy client initialization to support testing without API key
+- Improved error handling with explicit `ValueError` when API key is missing
+
+**Code Example - Before:**
+```python
+import openai
+openai.api_key = os.environ["OPENAI_API_KEY"]
+result = openai.ChatCompletion.create(model=model, messages=messages)
+```
+
+**Code Example - After:**
+```python
+from openai import OpenAI
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))  # Lazy init
+result = client.chat.completions.create(model=model, messages=messages)
+```
+
+### Phue Library Upgrade (1.1 → phue2 0.0.3)
+
+Upgraded from the legacy `phue` library to the modernized `phue2` fork to resolve setuptools compatibility issues with Python 3.11+:
+
+**Benefits:**
+- Type annotations for better IDE support
+- Modern Python packaging
+- Improved error handling
+- API remains backward compatible with original phue
+
+**Usage:** Imported as `import phue2 as phue` for seamless compatibility
+
 ## Development Guidelines
 
 ### Code Style
 - Flat file structure (all modules in root directory)
 - Python conventions and naming
 - Error handling for JSON parsing failures
+- Lazy initialization pattern for API clients
 
 ### Testing
 - Run tests with: `python tests.py`
