@@ -4,9 +4,10 @@ import re
 from json import JSONDecodeError
 from typing import List
 
-import openai
+from openai import OpenAI
 
-openai.api_key = os.environ["OPENAI_API_KEY"]
+# Initialize client (will be created on first use if api_key not set at import time)
+client = None
 
 
 class ChatBot:
@@ -47,12 +48,21 @@ class ChatBot:
         The response from OpenAI as a list of dictionaries containing the color and light_id
         for each light.
         """
+        global client
+
+        # Initialize client on first use
+        if client is None:
+            api_key = os.environ.get("OPENAI_API_KEY")
+            if not api_key:
+                raise ValueError("OPENAI_API_KEY environment variable is not set")
+            client = OpenAI(api_key=api_key)
+
         self.messages.append({
             "role": "user",
             "content": message,
         })
 
-        result = openai.ChatCompletion.create(
+        result = client.chat.completions.create(
             model=self.model,
             messages=self.messages,
         )

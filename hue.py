@@ -2,7 +2,7 @@ import time
 from pathlib import Path
 
 import discoverhue
-import phue
+import phue2 as phue
 
 
 def find_ip() -> str:
